@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JournalMatch — find affordable, fitting journals for plant scientists in Africa & LMICs</title>
+<meta name="description" content="Paste a manuscript title and get indexed journals that fit your work and cost the least after APC waivers — built for plant & crop scientists in Africa and other low- and middle-income countries.">
+<style>
+  :root{
+    --green:#1b7a4b;--green-d:#0f5233;--green-l:#e9f6ee;--green-b:#c7e7d3;
+    --amber:#a86711;--amber-l:#fdf3e0;--amber-b:#f0dcb4;
+    --red:#b02a2a;--red-l:#fbe9e9;--red-b:#f0c9c9;
+    --ink:#16201c;--muted:#5c6b64;--faint:#8a978f;--line:#e6ece8;--bg:#f4f7f5;--card:#fff;--blue:#1256b8;
+    --shadow:0 1px 2px rgba(16,40,30,.04),0 8px 24px -12px rgba(16,40,30,.14);
+    --shadow-lg:0 2px 4px rgba(16,40,30,.05),0 24px 48px -20px rgba(16,40,30,.28);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink);background:var(--bg);line-height:1.55;-webkit-font-smoothing:antialiased}
+  a{color:var(--blue)}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+
+  /* hero */
+  .hero{background:radial-gradient(1200px 400px at 70% -10%,rgba(255,255,255,.14),transparent),
+        linear-gradient(135deg,var(--green) 0%,var(--green-d) 100%);color:#fff;padding:40px 0 88px;position:relative}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;letter-spacing:-.2px}
+  .brand .dot{font-size:22px}
+  .tag{display:inline-block;margin-top:22px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);
+    color:#eafff2;font-size:12px;font-weight:600;padding:4px 11px;border-radius:100px}
+  .hero h1{margin:14px 0 8px;font-size:38px;line-height:1.12;letter-spacing:-1px;max-width:760px;font-weight:800}
+  .hero p{margin:0;font-size:16.5px;opacity:.94;max-width:660px}
+  .stats{display:flex;gap:26px;margin-top:24px;flex-wrap:wrap}
+  .stat b{display:block;font-size:22px;font-weight:800}
+  .stat span{font-size:12.5px;opacity:.85}
+
+  /* search card */
+  .searchwrap{margin-top:-64px;position:relative;z-index:3}
+  .search{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-lg);padding:22px}
+  .lab{display:block;font-weight:650;font-size:13px;margin:0 0 6px;color:var(--ink)}
+  .lab .req{color:var(--green);font-weight:700}
+  .lab .opt{color:var(--faint);font-weight:500}
+  .in{width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:11px;font-size:15px;font-family:inherit;
+    background:#fcfdfc;color:var(--ink);transition:border-color .15s,box-shadow .15s}
+  .in:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 4px var(--green-l);background:#fff}
+  textarea.in{resize:vertical;min-height:62px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+  .rowend{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:end;margin-top:14px}
+  .btn{background:var(--green);color:#fff;border:none;padding:13px 26px;border-radius:11px;font-size:15px;font-weight:700;
+    cursor:pointer;transition:background .15s,transform .05s;box-shadow:0 6px 16px -6px rgba(27,122,75,.6)}
+  .btn:hover{background:var(--green-d)}
+  .btn:active{transform:translateY(1px)}
+  .linkbtn{background:none;border:none;color:var(--green);font-size:13.5px;font-weight:600;cursor:pointer;padding:6px 2px}
+  .linkbtn:hover{text-decoration:underline}
+  .note{font-size:12.5px;color:var(--muted);margin-top:12px;display:flex;gap:8px;align-items:flex-start}
+
+  /* explainer */
+  .explain{margin:22px 0 0;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;
+    font-size:13px;color:var(--muted);box-shadow:var(--shadow)}
+  .explain b{color:var(--ink)}
+  .explain .k{display:inline-flex;gap:5px;align-items:center;font-weight:600;color:var(--ink)}
+
+  /* filters */
+  .filters{display:none;gap:10px;flex-wrap:wrap;align-items:center;margin:26px 0 6px;padding:12px 14px;
+    background:var(--card);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);position:sticky;top:10px;z-index:2}
+  .filters .flab{font-weight:700;font-size:13px;color:var(--ink);margin-right:2px}
+  .toggle{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer;
+    border:1px solid var(--line);padding:6px 11px;border-radius:100px;user-select:none;background:#fcfdfc}
+  .toggle input{accent-color:var(--green);margin:0}
+  .toggle:hover{border-color:var(--green-b)}
+  .sortwrap{margin-left:auto;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:7px}
+  .sort{font-size:13px;padding:7px 9px;border-radius:9px;border:1px solid var(--line);background:#fff;font-family:inherit;color:var(--ink)}
+
+  /* results */
+  .rhead{display:flex;justify-content:space-between;align-items:baseline;margin:20px 2px 14px;flex-wrap:wrap;gap:8px}
+  .rhead h2{font-size:19px;margin:0;letter-spacing:-.3px}
+  .rhead .count{color:var(--muted);font-size:13.5px}
+  .card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:15px;padding:18px 20px 16px;
+    margin-bottom:14px;box-shadow:var(--shadow);transition:box-shadow .16s,transform .16s,border-color .16s}
+  .card:hover{box-shadow:var(--shadow-lg);transform:translateY(-1px);border-color:var(--green-b)}
+  .card.free{border-left:4px solid var(--green)}
+  .ctop{display:flex;align-items:flex-start;gap:13px}
+  .rank{flex:none;width:30px;height:30px;border-radius:9px;background:var(--green-l);color:var(--green-d);
+    font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;margin-top:1px}
+  .card.free .rank{background:var(--green);color:#fff}
+  .jname{font-size:16.5px;font-weight:750;letter-spacing:-.2px;line-height:1.25}
+  .jname a{color:var(--ink);text-decoration:none}
+  .jname a:hover{color:var(--green-d);text-decoration:underline}
+  .pub{color:var(--faint);font-size:12px;margin-top:2px}
+  .iff{flex:none;margin-left:auto;text-align:right}
+  .iff b{display:block;font-size:16px;font-weight:800;color:var(--green-d);line-height:1}
+  .iff span{font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.4px}
+  .cost{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:13px 0 0}
+  .pill{font-size:13.5px;font-weight:750;padding:6px 13px;border-radius:100px;display:inline-flex;align-items:center;gap:6px}
+  .pill.g{background:var(--green-l);color:var(--green-d);border:1px solid var(--green-b)}
+  .pill.a{background:var(--amber-l);color:var(--amber);border:1px solid var(--amber-b)}
+  .pill.r{background:var(--red-l);color:var(--red);border:1px solid var(--red-b)}
+  .verify{font-size:12px;color:var(--muted)}
+  .verify a{color:var(--blue);font-weight:600}
+  .altcost{font-size:12.5px;color:var(--muted);margin:8px 0 0 2px}
+  .chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:13px}
+  .chip{font-size:11.5px;padding:4px 10px;border-radius:8px;border:1px solid var(--line);background:#fbfcfb;
+    color:var(--muted);display:inline-flex;align-items:center;gap:4px;font-weight:500}
+  .chip.g{background:var(--green-l);border-color:var(--green-b);color:var(--green-d)}
+  .chip.a{background:var(--amber-l);border-color:var(--amber-b);color:var(--amber)}
+  .chip.r{background:var(--red-l);border-color:var(--red-b);color:var(--red)}
+  .chip.if{background:#eef4fb;border-color:#d3e3f6;color:var(--blue);font-weight:650}
+  .why{font-size:12.5px;color:var(--muted);margin-top:12px;border-top:1px dashed var(--line);padding-top:10px}
+  .why b{color:var(--ink);font-weight:650}
+  .fitbar{display:inline-block;width:64px;height:6px;border-radius:6px;background:#e9efec;vertical-align:middle;
+    margin:0 7px;overflow:hidden;position:relative;top:-1px}
+  .fitbar>i{display:block;height:100%;background:var(--green)}
+  .empty{text-align:center;color:var(--muted);padding:34px;background:var(--card);border:1px solid var(--line);border-radius:15px}
+
+  footer{color:var(--faint);font-size:12px;text-align:center;padding:28px 20px 40px;line-height:1.7}
+  footer b{color:var(--muted)}
+  @media(max-width:680px){
+    .hero h1{font-size:29px}.hero{padding:30px 0 80px}
+    .grid2{grid-template-columns:1fr}.rowend{grid-template-columns:1fr}
+    .iff{margin-left:0}.filters{position:static}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="brand"><span class="dot">🌱</span> JournalMatch</div>
+    <span class="tag">Research preview · figures are approximate — always verify</span>
+    <h1>The right journal for your paper — that you can actually afford to publish in.</h1>
+    <p>For plant &amp; crop scientists in Africa and other low- and middle-income countries. Paste a manuscript title; get indexed, credible journals ranked by fit and by real cost after APC waivers.</p>
+    <div class="stats">
+      <div class="stat"><b>37</b><span>curated journals</span></div>
+      <div class="stat"><b>106</b><span>waiver-eligible countries</span></div>
+      <div class="stat"><b>3</b><span>axes: fit · cost · speed</span></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="searchwrap">
+    <div class="search">
+      <label class="lab" for="title">Manuscript title <span class="req">— required</span></label>
+      <input class="in" type="text" id="title" placeholder="e.g. Genome-Wide Association Study of Grain Yield and Drought Tolerance in Cowpea">
+      <div class="grid2">
+        <div><label class="lab" for="abstract">Abstract <span class="opt">— optional, sharpens the match</span></label>
+          <textarea class="in" id="abstract" placeholder="Paste your abstract…"></textarea></div>
+        <div><label class="lab" for="keywords">Keywords <span class="opt">— optional, comma-separated</span></label>
+          <textarea class="in" id="keywords" placeholder="cowpea, GWAS, drought, SNP markers, legume"></textarea></div>
+      </div>
+      <div class="rowend">
+        <div><label class="lab" for="country">Country of your institution <span class="opt">— sets your waiver tier</span></label>
+          <select class="in" id="country"></select></div>
+        <button class="btn" onclick="runMatch()">Find journals →</button>
+      </div>
+      <div class="note">
+        <span>💡</span>
+        <span>New here? <button class="linkbtn" onclick="loadExample()">Load a worked example (cowpea GWAS)</button> to see how it works.</span>
+      </div>
+    </div>
+
+    <div class="explain">
+      <b>How the money works.</b> Wiley, Elsevier, Springer and Taylor &amp; Francis waive fees <b>only on fully open-access journals, never hybrid ones</b>. If your country is Tier A (Kenya, Benin + 75 others) you typically pay <b>nothing and get open access</b> on a participating fully-OA journal. A <span class="k">🔒 hybrid</span> journal gives <b>no waiver on its OA option</b> — so we show its <b>free subscription route</b> (paywalled) as the headline and note the paid OA price beneath. Every figure links to the publisher's own policy: <b>verify before you submit.</b>
+    </div>
+  </div>
+
+  <div class="filters" id="filters">
+    <span class="flab">Filter:</span>
+    <label class="toggle"><input type="checkbox" id="f-free" onchange="render()"> Free / fully waived</label>
+    <label class="toggle"><input type="checkbox" id="f-fast" onchange="render()"> Fast turnaround</label>
+    <label class="toggle"><input type="checkbox" id="f-oa" onchange="render()"> Fully open access</label>
+    <span class="sortwrap">Sort
+      <select class="sort" id="sort" onchange="render()">
+        <option value="cost">Lowest cost to me</option>
+        <option value="fit">Best topical fit</option>
+        <option value="if">Highest impact factor</option>
+        <option value="speed">Fastest</option>
+      </select>
+    </span>
+  </div>
+
+  <div id="output"></div>
+</main>
+
+<footer>
+  <b>JournalMatch</b> · research preview · a curated, verifiable guide — not a substitute for checking each journal's own policy.<br>
+  Concept by Abdou · waiver logic based on publisher &amp; Research4Life policies · impact factors &amp; APCs approximate (2024–25).
+</footer>
+
+<script>
+const DATA = {"groupA": ["Afghanistan", "Angola", "Bangladesh", "Benin", "Bhutan", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia", "Cameroon", "Central African Republic", "Chad", "Comoros", "Congo", "Congo (Dem. Rep.)", "Cook Islands", "Cote d'Ivoire", "Djibouti", "Equatorial Guinea", "Eritrea", "Eswatini", "Ethiopia", "Gambia", "Ghana", "Guinea", "Guinea-Bissau", "Guyana", "Iran", "Kenya", "Kiribati", "Korea (DPR)", "Kyrgyzstan", "Lao PDR", "Lebanon", "Lesotho", "Liberia", "Madagascar", "Malawi", "Maldives", "Mali", "Marshall Islands", "Mauritania", "Micronesia", "Mozambique", "Myanmar", "Nauru", "Nepal", "Niger", "Niue", "Palau", "Palestine", "Papua New Guinea", "Moldova", "Rwanda", "Saint Helena", "Samoa", "Sao Tome and Principe", "Senegal", "Sierra Leone", "Solomon Islands", "Somalia", "South Sudan", "Sudan", "Syria", "Tajikistan", "Timor-Leste", "Togo", "Tokelau", "Tonga", "Tuvalu", "Uganda", "Ukraine", "Tanzania", "Vanuatu", "Yemen", "Zambia", "Zimbabwe"], "groupB": ["Albania", "Algeria", "Armenia", "Azerbaijan", "Belarus", "Bosnia and Herzegovina", "Botswana", "Egypt", "Fiji", "Gabon", "Georgia", "Iraq", "Jordan", "Kosovo", "Libya", "Mauritius", "Mongolia", "Montenegro", "Morocco", "Namibia", "Nigeria", "North Macedonia", "Pakistan", "Serbia", "Seychelles", "Sri Lanka", "Tunisia", "Uzbekistan", "Vietnam"], "journals": [{"name": "Legume Science", "pub": "Wiley", "rule": "Wiley (fully-OA)", "oa": "Gold (fully-OA)", "apc": 3230, "iff": 5.8, "idx": "Scopus; WoS SCIE", "issn": "26396181", "turn": "medium", "rev": "single-blind", "pred": "No", "scope": ["legume", "legumes", "pulse", "mungbean", "vigna", "cowpea", "common bean", "soybean", "chickpea", "grain legume", "nitrogen fixation", "drought", "abiotic stress", "breeding", "genetics", "physiology"], "jurl": "https://onlinelibrary.wiley.com/journal/26396181", "vurl": "https://authors.wiley.com/author-resources/Journal-Authors/open-access/article-publication-charges/waivers-and-discounts.html", "notes": "Fully-OA Wiley; Kenya/Benin -> 100% waiver. Most specific outlet for legumes/mungbean."}, {"name": "Frontiers in Plant Science", "pub": "Frontiers", "rule": "Frontiers (fee support)", "oa": "Gold (fully-OA)", "apc": 3150, "iff": 4.7, "idx": "Scopus; WoS SCIE", "issn": "1664462X", "turn": "fast", "rev": "open", "pred": "No", "scope": ["plant", "crop", "drought", "abiotic stress", "photosynthesis", "physiology", "genomics", "gwas", "molecular", "breeding", "biochemistry", "stress tolerance", "gene expression", "legume"], "jurl": "https://www.frontiersin.org/journals/plant-science", "vurl": "https://www.frontiersin.org/about/fee-policy", "notes": "Fully-OA; fee support discretionary, not guaranteed 100% - apply at submission."}, {"name": "Frontiers in Genetics", "pub": "Frontiers", "rule": "Frontiers (fee support)", "oa": "Gold (fully-OA)", "apc": 2950, "iff": 2.8, "idx": "Scopus; WoS SCIE", "issn": "16648021", "turn": "fast", "rev": "open", "pred": "No", "scope": ["genetics", "genomics", "gwas", "genomic selection", "molecular markers", "quantitative genetics", "statistical genetics", "breeding", "bioinformatics", "qtl", "snp"], "jurl": "https://www.frontiersin.org/journals/genetics", "vurl": "https://www.frontiersin.org/about/fee-policy", "notes": "Good fit for GWAS / genomic-selection methods papers."}, {"name": "BMC Plant Biology", "pub": "Springer Nature", "rule": "Springer Nature / BMC (fully-OA)", "oa": "Gold (fully-OA)", "apc": 2690, "iff": 4.0, "idx": "Scopus; WoS SCIE", "issn": "14712229", "turn": "medium", "rev": "single-blind", "pred": "No", "scope": ["plant", "crop", "genomics", "molecular", "gwas", "gene expression", "drought", "abiotic stress", "physiology", "breeding", "transcriptome", "stress tolerance"], "jurl": "https://bmcplantbiol.biomedcentral.com/", "vurl": "https://www.springernature.com/gp/open-science/policies/journal-policies/apc-waiver-countries", "notes": "Fully-OA BMC; waiver for lowest-income countries."}, {"name": "BMC Genomics", "pub": "Springer Nature", "rule": "Springer Nature / BMC (fully-OA)", "oa": "Gold (fully-OA)", "apc": 2890, "iff": 3.5, "idx": "Scopus; WoS SCIE", "issn": "14712164", "turn": "medium", "rev": "single-blind", "pred": "No", "scope": ["genomics", "transcriptome", "gwas", "sequencing", "gene expression", "molecular", "bioinformatics", "genome", "snp", "crop"], "jurl": "https://bmcgenomics.biomedcentral.com/", "vurl": "https://www.springernature.com/gp/open-science/policies/journal-policies/apc-waiver-countries", "notes": "For genomics/transcriptomics-heavy papers."}, {"name": "Scientific African", "pub": "Elsevier", "rule": "Elsevier (gold OA)", "oa": "Gold (fully-OA)", "apc": 1290, "iff": 2.7, "idx": "Scopus; WoS ESCI", "issn": "24682276", "turn": "medium", "rev": "single-blind", "pred": "No", "scope": ["africa", "crop", "agriculture", "drought", "food security", "biology", "agronomy", "development", "legume", "genetics", "plant"], "jurl": "https://www.sciencedirect.com/journal/scientific-african", "vurl": "https://www.elsevier.com/open-access", "notes": "Pan-African gold OA; lower list APC + Elsevier waiver for Group A."}, {"name": "PLOS ONE", "pub": "PLOS", "rule": "PLOS (Global Participation Initiative)", "oa": "Gold (fully-OA)", "apc": 2475, "iff": 2.9, "idx": "Scopus; WoS SCIE", "issn": "19326203", "turn": "medium", "rev": "single-blind", "pred": "No", "scope": ["biology", "crop", "plant", "genetics", "drought", "agronomy", "physiology", "molecular", "multidisciplinary", "gwas"], "jurl": "https://journals.plos.org/plosone/", "vurl": "https://plos.org/publish/fees/", "notes": "Free only for GPI Group 1 countries - verify your country."}, {"name": "The Crop Journal", "pub": "KeAi (CSCS)", "rule": "Diamond OA (KeAi, SciELO)", "oa": "Diamond (no APC)", "apc": 0, "iff": 6.6, "idx": "Scopus; WoS SCIE", "issn": "2214-5141; 2095-5421", "turn": "medium", "rev": "single-blind", "pred": "No", "scope": ["crop", "breeding", "genetics", "genomics", "gwas", "genomic selection", "yield", "drought", "molecular", "germplasm", "cultivar", "qtl"], "jurl": "https://www.sciencedirect.com/journal/the-crop-journal", "vurl": "", "notes": "No APC for anyone; strong IF. Excellent value for breeding/genomics."}, {"name": "Crop Breeding and Applied Biotechnology", "pub": "SBMP (SciELO)", "rule": "Diamond OA (KeAi, SciELO)", "oa": "Diamond (no APC)", "apc": 0, "iff": 1.5, "idx": "Scopus; WoS SCIE", "issn": "15187853; 19847033", "turn": "medium", "rev": "double-blind", "pred": "No", "scope": ["breeding", "crop", "genetics", "biotechnology", "cultivar", "genomic selection", "gwas", "molecular markers", "germplasm", "quantitative genetics", "drought"], "jurl": "https://www.scielo.br/j/cbab/", "vurl": "", "notes": "No APC; solid outlet for applied breeding."}, {"name": "Plant Physiology and Biochemistry", "pub": "Elsevier", "rule": "Elsevier (gold OA)", "oa": "Hybrid", "apc": 3510, "iff": 6.1, "idx": "Scopus; WoS SCIE", "issn": "02543591", "turn": "medium", "rev": "single-blind", "pred": "No", "scope": ["physiology", "biochemistry", "drought", "abiotic stress", "photosynthesis", "antioxidant", "metabolism", "molecular", "stress tolerance", "plant", "proline"], "jurl": "https://www.sciencedirect.com/journal/plant-physiology-and-biochemistry", "vurl": "https://www.elsevier.com/open-access", "notes": "HYBRID - free via subscription route; OA option is NOT waived."}, {"name": "Environmental and Experimental Botany", "pub": "Elsevier", "rule": "Elsevier (gold OA)", "oa": "Hybrid", "apc": 3470, "iff": 4.5, "idx": "Scopus; WoS SCIE", "issn": "00988472", "turn": "medium", "rev": "single-blind", "pred": "No", "scope": ["drought", "abiotic stress", "water stress", "physiology", "photosynthesis", "stress tolerance", "plant", "ecophysiology", "heat", "salinity"], "jurl": "https://www.sciencedirect.com/journal/environmental-and-experimental-botany", "vurl": "https://www.elsevier.com/open-access", "notes": "HYBRID - strong fit for drought/abiotic-stress physiology."}, {"name": "Field Crops Research", "pub": "Elsevier", "rule": "Elsevier (gold OA)", "oa": "Hybrid", "apc": 3710, "iff": 5.6, "idx": "Scopus; WoS SCIE", "issn": "03784290; 18726852", "turn": "slow", "rev": "single-blind", "pred": "No", "scope": ["crop", "agronomy", "yield", "drought", "field", "water use", "physiology", "cropping system", "legume", "cultivar", "photosynthesis"], "jurl": "https://www.sciencedirect.com/journal/field-crops-research", "vurl": "https://www.elsevier.com/open-access", "notes": "HYBRID; high impact but slow."}, {"name": "Theoretical and Applied Genetics", "pub": "Springer Nature", "rule": "Springer Nature / BMC (fully-OA)", "oa": "Hybrid", "apc": 3490, "iff": 4.4, "idx": "Scopus; WoS SCIE", "issn": "00405752; 14322242", "turn": "slow", "rev": "single-blind", "pred": "No", "scope": ["genetics", "genomics", "gwas", "qtl", "genomic selection", "breeding", "molecular markers", "mapping", "crop", "quantitative", "heritability"], "jurl": "https://www.springer.com/journal/122", "vurl": "https://www.springernature.com/gp/open-science/policies/journal-policies/apc-waiver-countries", "notes": "HYBRID - Springer waiver does NOT apply. Prestige outlet for GWAS/mapping."}, {"name": "Euphytica", "pub": "Springer Nature", "rule": "Springer Nature / BMC (fully-OA)", "oa": "Hybrid", "apc": 3290, "iff": 1.7, "idx": "Scopus; WoS SCIE", "issn": "00142336; 15735060", "turn": "slow", "rev": "single-blind", "pred": "No", "scope": ["breeding", "plant", "crop", "genetics", "germplasm", "qtl", "cultivar", "quantitative genetics", "genomic selection", "drought", "legume", "resistance"], "jurl": "https://www.springer.com/journal/10681", "vurl": "https://www.springernature.com/gp/open-science/policies/journal-policies/apc-waiver-countries", "notes": "HYBRID. Classic plant-breeding journal."}, {"name": "Plant Breeding", "pub": "Wiley", "rule": "Wiley (fully-OA)", "oa": "Hybrid", "apc": 4200, "iff": 1.9, "idx": "Scopus; WoS SCIE", "issn": "01799541; 14390523", "turn": "medium", "rev": "single-blind", "pred": "No", "scope": ["breeding", "crop", "genetics", "cultivar", "qtl", "heterosis", "germplasm", "molecular markers", "drought", "resistance", "legume", "yield"], "jurl": "https://onlinelibrary.wiley.com/journal/14390523", "vurl": "https://authors.wiley.com/author-resources/Journal-Authors/open-access/article-publication-charges/waivers-and-discounts.html", "notes": "HYBRID - Wiley waiver applies to fully-OA titles ONLY."}, {"name": "Crop Science", "pub": "Wiley (CSSA)", "rule": "Wiley (fully-OA)", "oa": "Hybrid", "apc": 3500, "iff": 2.0, "idx": "Scopus; WoS SCIE", "issn": "0011183X; 14350653", "turn": "medium", "rev": "single-blind", "pred": "No", "scope": ["crop", "breeding", "genetics", "agronomy", "cultivar", "germplasm", "yield", "genomic selection", "qtl", "drought", "registration"], "jurl": "https://acsess.onlinelibrary.wiley.com/journal/14350653", "vurl": "https://authors.wiley.com/author-resources/Journal-Authors/open-access/article-publication-charges/waivers-and-discounts.html", "notes": "HYBRID. Society journal (CSSA)."}, {"name": "Journal of Agronomy and Crop Science", "pub": "Wiley", "rule": "Wiley (fully-OA)", "oa": "Hybrid", "apc": 4000, "iff": 3.5, "idx": "Scopus; WoS SCIE", "issn": "09312250; 1439037X", "turn": "medium", "rev": "single-blind", "pred": "No", "scope": ["agronomy", "crop", "drought", "abiotic stress", "physiology", "yield", "water stress", "cultivar", "photosynthesis", "legume"], "jurl": "https://onlinelibrary.wiley.com/journal/1439037x", "vurl": "https://authors.wiley.com/author-resources/Journal-Authors/open-access/article-publication-charges/waivers-and-discounts.html", "notes": "HYBRID."}, {"name": "Genetic Resources and Crop Evolution", "pub": "Springer Nature", "rule": "Springer Nature / BMC (fully-OA)", "oa": "Hybrid", "apc": 3290, "iff": 1.5, "idx": "Scopus; WoS SCIE", "issn": "09259864; 15735109", "turn": "slow", "rev": "single-blind", "pred": "No", "scope": ["germplasm", "genetic resources", "diversity", "landrace", "crop", "evolution", "characterization", "legume", "conservation", "breeding"], "jurl": "https://www.springer.com/journal/10722", "vurl": "https://www.springernature.com/gp/open-science/policies/journal-policies/apc-waiver-countries", "notes": "HYBRID - good for diversity/germplasm characterization."}, {"name": "Plant Genetic Resources", "pub": "Cambridge", "rule": "Cambridge University Press", "oa": "Hybrid", "apc": 2890, "iff": 1.0, "idx": "Scopus; WoS SCIE", "issn": "1479-2621; 1479-263X", "turn": "medium", "rev": "single-blind", "pred": "No", "scope": ["genetic resources", "germplasm", "diversity", "landrace", "crop", "characterization", "conservation", "legume", "breeding", "evaluation"], "jurl": "https://www.cambridge.org/core/journals/plant-genetic-resources", "vurl": "https://www.cambridge.org/core/services/open-access-policies/open-access-journals/waivers-discounts-for-open-access-apcs", "notes": "HYBRID - verify Cambridge waiver for the OA route."}, {"name": "Physiologia Plantarum", "pub": "Wiley", "rule": "Wiley (fully-OA)", "oa": "Hybrid", "apc": 4000, "iff": 5.0, "idx": "Scopus; WoS SCIE", "issn": "00319317; 13993054", "turn": "medium", "rev": "single-blind", "pred": "No", "scope": ["physiology", "photosynthesis", "drought", "abiotic stress", "water stress", "biochemistry", "stress tolerance", "plant", "metabolism"], "jurl": "https://onlinelibrary.wiley.com/journal/13993054", "vurl": "https://authors.wiley.com/author-resources/Journal-Authors/open-access/article-publication-charges/waivers-and-discounts.html", "notes": "HYBRID."}, {"name": "Journal of Experimental Botany", "pub": "Oxford (SEB)", "rule": "Oxford University Press", "oa": "Hybrid", "apc": 3800, "iff": 5.6, "idx": "Scopus; WoS SCIE", "issn": "00220957; 14602431", "turn": "slow", "rev": "single-blind", "pred": "No", "scope": ["plant", "physiology", "molecular", "photosynthesis", "drought", "abiotic stress", "gene expression", "biochemistry", "stress tolerance", "metabolism"], "jurl": "https://academic.oup.com/jxb", "vurl": "https://academic.oup.com/journals/pages/open_access/waivers", "notes": "HYBRID."}, {"name": "Journal of Crop Improvement", "pub": "Taylor & Francis", "rule": "Taylor & Francis (fully-OA)", "oa": "Hybrid", "apc": 3150, "iff": 1.5, "idx": "Scopus; WoS ESCI", "issn": "15427528; 15427536", "turn": "medium", "rev": "single-blind", "pred": "No", "scope": ["crop", "breeding", "agronomy", "drought", "yield", "cultivar", "stress tolerance", "genetics", "legume", "improvement"], "jurl": "https://www.tandfonline.com/journals/wcim20", "vurl": "https://authorservices.taylorandfrancis.com/choose-open/publishing-open-access/requesting-an-apc-waiver/eligible-countries/", "notes": "HYBRID - T&F waiver applies to fully-OA titles only."}, {"name": "Crop & Pasture Science", "pub": "CSIRO", "rule": "CSIRO Publishing", "oa": "Hybrid", "apc": 3000, "iff": 1.7, "idx": "Scopus; WoS SCIE", "issn": "18360947; 18365795", "turn": "medium", "rev": "single-blind", "pred": "No", "scope": ["crop", "pasture", "agronomy", "breeding", "drought", "yield", "legume", "physiology", "field", "cultivar"], "jurl": "https://www.publish.csiro.au/cp", "vurl": "https://www.publish.csiro.au/about/OpenAccess", "notes": "HYBRID - waiver case-by-case."}, {"name": "The Plant Genome", "pub": "Wiley (CSSA)", "rule": "Wiley (fully-OA)", "oa": "Gold (fully-OA)", "apc": 3520, "iff": 3.3, "idx": "Scopus; WoS SCIE", "issn": "19403372", "turn": "medium", "rev": "single-blind", "pred": "No", "scope": ["genomics", "genomic selection", "gwas", "snp", "molecular markers", "breeding", "crop", "quantitative genetics", "qtl", "sequencing", "prediction"], "jurl": "https://acsess.onlinelibrary.wiley.com/journal/19403372", "vurl": "https://authors.wiley.com/author-resources/Journal-Authors/open-access/article-publication-charges/waivers-and-discounts.html", "notes": "Fully-OA (CSSA/Wiley); Kenya/Benin -> 100% waiver. Ideal for GWAS & genomic selection."}, {"name": "Plant Methods", "pub": "Springer Nature", "rule": "Springer Nature / BMC (fully-OA)", "oa": "Gold (fully-OA)", "apc": 3190, "iff": 5.0, "idx": "Scopus; WoS SCIE", "issn": "17464811", "turn": "medium", "rev": "single-blind", "pred": "No", "scope": ["phenotyping", "high-throughput", "phenomics", "imaging", "photosynthesis", "methods", "measurement", "sensor", "protocol", "plant", "image analysis"], "jurl": "https://plantmethods.biomedcentral.com/", "vurl": "https://www.springernature.com/gp/open-science/policies/journal-policies/apc-waiver-countries", "notes": "Fully-OA BMC; waiver for Group A. Ideal for high-throughput phenotyping / photosynthesis methods."}, {"name": "Plant Phenomics", "pub": "Elsevier", "rule": "Elsevier (gold OA)", "oa": "Gold (fully-OA)", "apc": 1800, "iff": 6.5, "idx": "Scopus; WoS SCIE", "issn": "2643-6515", "turn": "fast", "rev": "single-blind", "pred": "No", "scope": ["phenotyping", "high-throughput", "phenomics", "imaging", "remote sensing", "photosynthesis", "machine learning", "drought", "canopy", "plant", "deep learning"], "jurl": "https://www.sciencedirect.com/journal/plant-phenomics", "vurl": "https://www.elsevier.com/open-access", "notes": "Fully-OA; verify APC (recently moved to Elsevier). Perfect for HTP phenotyping."}, {"name": "Frontiers in Agronomy", "pub": "Frontiers", "rule": "Frontiers (fee support)", "oa": "Gold (fully-OA)", "apc": 2950, "iff": 2.6, "idx": "Scopus; WoS ESCI", "issn": "2673-3218", "turn": "fast", "rev": "open", "pred": "No", "scope": ["agronomy", "crop", "drought", "yield", "soil", "cropping system", "water", "legume", "field", "sustainable", "climate"], "jurl": "https://www.frontiersin.org/journals/agronomy", "vurl": "https://www.frontiersin.org/about/fee-policy", "notes": "Fully-OA; fee support discretionary."}, {"name": "AoB PLANTS", "pub": "Oxford University Press", "rule": "Oxford University Press", "oa": "Gold (fully-OA)", "apc": 2400, "iff": 3.2, "idx": "Scopus; WoS SCIE", "issn": "2041-2851", "turn": "medium", "rev": "single-blind", "pred": "No", "scope": ["plant", "ecology", "abiotic stress", "drought", "adaptation", "physiology", "stress tolerance", "evolution", "environment"], "jurl": "https://academic.oup.com/aobpla", "vurl": "https://academic.oup.com/journals/pages/open_access/waivers", "notes": "Fully-OA OUP title; OA waiver applies (unlike OUP hybrids)."}, {"name": "Plant Direct", "pub": "Wiley (ASPB/SEB)", "rule": "Wiley (fully-OA)", "oa": "Gold (fully-OA)", "apc": 2000, "iff": 2.8, "idx": "Scopus; WoS SCIE", "issn": "24754455", "turn": "fast", "rev": "single-blind", "pred": "No", "scope": ["plant", "molecular", "physiology", "genetics", "gene expression", "stress", "cell biology", "genomics", "fast"], "jurl": "https://onlinelibrary.wiley.com/journal/24754455", "vurl": "https://authors.wiley.com/author-resources/Journal-Authors/open-access/article-publication-charges/waivers-and-discounts.html", "notes": "Fully-OA (ASPB/SEB/Wiley); fast, sound-science. Kenya/Benin -> 100% waiver."}, {"name": "Czech Journal of Genetics and Plant Breeding", "pub": "Czech Academy of Agric. Sciences", "rule": "Diamond OA (KeAi, SciELO)", "oa": "Diamond (no APC)", "apc": 0, "iff": 1.7, "idx": "Scopus; WoS SCIE", "issn": "1212-1975; 1805-9317", "turn": "medium", "rev": "double-blind", "pred": "No", "scope": ["breeding", "genetics", "cultivar", "molecular markers", "qtl", "resistance", "crop", "germplasm", "heritability", "selection"], "jurl": "https://cjgpb.agriculturejournals.cz/", "vurl": "", "notes": "No/low APC (academy-funded); solid genetics & breeding outlet."}, {"name": "Electronic Journal of Plant Breeding", "pub": "Indian Society of Plant Breeders", "rule": "Diamond OA (KeAi, SciELO)", "oa": "Diamond (no APC)", "apc": 0, "iff": 0.7, "idx": "Scopus", "issn": "0975-928X", "turn": "fast", "rev": "double-blind", "pred": "No", "scope": ["breeding", "genetics", "cultivar", "heterosis", "qtl", "germplasm", "crop", "variability", "selection", "combining ability"], "jurl": "https://ejplantbreeding.org/", "vurl": "", "notes": "Low/no APC; fast; applied breeding (Scopus-indexed)."}, {"name": "Agriculture and Food Security", "pub": "Springer Nature", "rule": "Springer Nature / BMC (fully-OA)", "oa": "Gold (fully-OA)", "apc": 1690, "iff": 3.0, "idx": "Scopus; WoS ESCI", "issn": "2048-7010", "turn": "medium", "rev": "single-blind", "pred": "No", "scope": ["food security", "africa", "crop", "agronomy", "smallholder", "legume", "yield", "development", "nutrition", "climate"], "jurl": "https://agricultureandfoodsecurity.biomedcentral.com/", "vurl": "https://www.springernature.com/gp/open-science/policies/journal-policies/apc-waiver-countries", "notes": "Fully-OA BMC; Africa/food-security focus; waiver for Group A."}, {"name": "Crop and Environment", "pub": "KeAi (Elsevier)", "rule": "Diamond OA (KeAi, SciELO)", "oa": "Diamond (no APC)", "apc": 0, "iff": 3.0, "idx": "Scopus", "issn": "2773-126X", "turn": "fast", "rev": "single-blind", "pred": "No", "scope": ["crop", "environment", "drought", "climate", "water", "agronomy", "stress", "yield", "sustainable", "physiology"], "jurl": "https://www.sciencedirect.com/journal/crop-and-environment", "vurl": "", "notes": "No APC (KeAi-sponsored); crop x environment/drought."}, {"name": "In Silico Plants", "pub": "Oxford University Press", "rule": "Oxford University Press", "oa": "Gold (fully-OA)", "apc": 2000, "iff": 2.5, "idx": "Scopus; WoS ESCI", "issn": "2517-5025", "turn": "medium", "rev": "single-blind", "pred": "No", "scope": ["modeling", "crop model", "simulation", "genomics", "phenotype", "physiology", "photosynthesis", "drought", "systems biology", "prediction"], "jurl": "https://academic.oup.com/insilicoplants", "vurl": "https://academic.oup.com/journals/pages/open_access/waivers", "notes": "Fully-OA OUP; crop modeling & phenotype prediction."}, {"name": "Plant Communications", "pub": "Cell Press (Elsevier)", "rule": "Elsevier (gold OA)", "oa": "Gold (fully-OA)", "apc": 3500, "iff": 9.4, "idx": "Scopus; WoS SCIE", "issn": "2590-3462", "turn": "medium", "rev": "single-blind", "pred": "No", "scope": ["molecular", "genomics", "plant", "gene", "crop", "functional genomics", "stress", "gwas", "cell", "evolution", "biotechnology"], "jurl": "https://www.cell.com/plant-communications/home", "vurl": "https://www.elsevier.com/open-access", "notes": "Fully-OA high-impact; verify - some Cell Press titles excluded from waivers."}, {"name": "Journal of Plant Interactions", "pub": "Taylor & Francis", "rule": "Taylor & Francis (fully-OA)", "oa": "Gold (fully-OA)", "apc": 1500, "iff": 2.9, "idx": "Scopus; WoS SCIE", "issn": "1742-9145", "turn": "medium", "rev": "single-blind", "pred": "No", "scope": ["abiotic stress", "drought", "physiology", "root", "rhizosphere", "stress tolerance", "plant", "antioxidant", "salinity", "nutrient"], "jurl": "https://www.tandfonline.com/journals/tjpi20", "vurl": "https://authorservices.taylorandfrancis.com/choose-open/publishing-open-access/requesting-an-apc-waiver/eligible-countries/", "notes": "Fully-OA T&F; waiver for low-income; abiotic-stress focus."}, {"name": "Plant Biotechnology Journal", "pub": "Wiley (SEB/AAB)", "rule": "Wiley (fully-OA)", "oa": "Gold (fully-OA)", "apc": 3500, "iff": 10.1, "idx": "Scopus; WoS SCIE", "issn": "14677652", "turn": "medium", "rev": "single-blind", "pred": "No", "scope": ["biotechnology", "genomics", "gene editing", "crispr", "crop", "molecular", "gwas", "transformation", "trait", "breeding", "genome"], "jurl": "https://onlinelibrary.wiley.com/journal/14677652", "vurl": "https://authors.wiley.com/author-resources/Journal-Authors/open-access/article-publication-charges/waivers-and-discounts.html", "notes": "Fully-OA high-impact; Kenya/Benin -> 100% waiver."}]};
+const A = new Set(DATA.groupA), B = new Set(DATA.groupB);
+const JOURNALS = DATA.journals;
+
+const COUNTRY_LIST = [...DATA.groupA.map(n=>({n,t:"A"})), ...DATA.groupB.map(n=>({n,t:"B"}))]
+  .sort((a,b)=>a.n.localeCompare(b.n));
+COUNTRY_LIST.push({n:"Other / high-income (no automatic waiver)",t:"none"});
+
+const STOP=new Set("a an the of for and or in in on to with from by using via review study analysis effect effects role toward towards enhanced high improvement improving through into under over between across based new novel case its their our this that these those approach approaches paper article research l walp".split(" "));
+function tokenize(s){return (s||"").toLowerCase().replace(/[()\[\]{}.,;:!?"'’`]/g," ").split(/\s+/).filter(w=>w.length>2&&!STOP.has(w)).map(w=>w.replace(/s$/,''));}
+
+const DF={}; const N=JOURNALS.length;
+JOURNALS.forEach(j=>{const seen=new Set(j.scope.map(x=>x.trim().replace(/s$/,'')));seen.forEach(t=>DF[t]=(DF[t]||0)+1);});
+function idf(term){const df=DF[term]||1;return Math.log((N+1)/df);}
+
+function buildQuery(title,abstract,keywords){
+  const bag={};const add=(t,w)=>tokenize(t).forEach(x=>bag[x]=(bag[x]||0)+w);
+  add(keywords,3);add(title,2);add(abstract,1);return bag;
+}
+function fitRaw(j,query){
+  const scope=j.scope.map(x=>x.trim().replace(/s$/,''));
+  let tot=0,got=0,rare=0,hits=[];
+  for(const term in query){
+    tot+=query[term];
+    let m=false;
+    for(const sc of scope){ if(sc===term||sc.includes(term)||term.includes(sc)){m=true;if(!hits.includes(sc))hits.push(sc);break;} }
+    if(m){got+=query[term]; if(idf(term)>1.6)rare++;}
+  }
+  const base=tot? got/tot:0; const bonus=Math.min(0.15,0.05*rare);
+  hits.sort((a,b)=>idf(b)-idf(a));
+  return {raw:Math.min(1,base+bonus),hits:hits.slice(0,4)};
+}
+function cost(j,tier){
+  const apc=j.apc;
+  if(j.oa.startsWith("Diamond")) return {c:0,pen:0,label:"Free — no APC (diamond OA)",cls:"g",cert:true};
+  const fully=j.oa.startsWith("Gold");
+  if(!fully){ return {c:0,pen:40,notOA:true,cert:true,cls:"a",
+      label:"Free via subscription route",
+      alt:"open access ~$"+apc+" — no waiver on hybrid journals"}; }
+  if(j.rule.indexOf("Frontiers")>-1){
+    if(tier==="A")return{c:0,pen:20,label:"Fee support — likely free",cls:"a",cert:false};
+    if(tier==="B")return{c:Math.round(apc*0.5),pen:0,label:"Partial support ~$"+Math.round(apc*0.5),cls:"a",cert:false};
+    return{c:apc,pen:0,label:"~$"+apc,cls:"r",cert:false};
+  }
+  if(j.rule.indexOf("PLOS")>-1){
+    if(tier==="A")return{c:0,pen:20,label:"Free if GPI Group 1",cls:"g",cert:false};
+    if(tier==="B")return{c:500,pen:0,label:"~$500 flat (GPI Grp 2)",cls:"a",cert:false};
+    return{c:apc,pen:0,label:"~$"+apc,cls:"r",cert:false};
+  }
+  if(tier==="A")return{c:0,pen:0,label:"Free (100% waiver) + open access",cls:"g",cert:true};
+  if(tier==="B")return{c:Math.round(apc*0.5),pen:0,label:"50% discount ~$"+Math.round(apc*0.5)+" · open access",cls:"a",cert:true};
+  return{c:apc,pen:0,label:"~$"+apc+" (no waiver)",cls:"r",cert:true};
+}
+function oaChip(oa){
+  if(oa.startsWith("Diamond"))return '<span class="chip g">🔓 Diamond OA · no fees</span>';
+  if(oa.startsWith("Gold"))return '<span class="chip g">🔓 Fully open access</span>';
+  return '<span class="chip a">🔒 Hybrid · OA optional</span>';
+}
+const TURN={fast:{l:"Fast (<~2 mo)",cls:"g",v:1},medium:{l:"Medium",cls:"a",v:2},slow:{l:"Slow",cls:"r",v:3}};
+const VMAP={"Wiley (fully-OA)":"https://authors.wiley.com/author-resources/Journal-Authors/open-access/article-publication-charges/waivers-and-discounts.html",
+"Elsevier (gold OA)":"https://www.elsevier.com/open-access","Springer Nature / BMC (fully-OA)":"https://www.springernature.com/gp/open-science/policies/journal-policies/apc-waiver-countries",
+"Taylor & Francis (fully-OA)":"https://authorservices.taylorandfrancis.com/choose-open/publishing-open-access/requesting-an-apc-waiver/eligible-countries/",
+"PLOS (Global Participation Initiative)":"https://plos.org/publish/fees/","Frontiers (fee support)":"https://www.frontiersin.org/about/fee-policy",
+"Oxford University Press":"https://academic.oup.com/journals/pages/open_access/waivers","Cambridge University Press":"https://www.cambridge.org/core/services/open-access-policies/open-access-journals/waivers-discounts-for-open-access-apcs",
+"CSIRO Publishing":"https://www.publish.csiro.au/about/OpenAccess","Diamond OA (KeAi, SciELO)":""};
+
+const FIT_FLOOR=0.60;
+let LAST=[],TIER="A",CNAME="";
+
+function runMatch(){
+  const title=document.getElementById('title').value.trim();
+  if(!title){document.getElementById('title').focus();document.getElementById('title').style.borderColor="#b02a2a";return;}
+  document.getElementById('title').style.borderColor="";
+  const q=buildQuery(title,document.getElementById('abstract').value,document.getElementById('keywords').value);
+  const cy=COUNTRY_LIST[document.getElementById('country').value];TIER=cy.t;CNAME=cy.n;
+  const scored=JOURNALS.map(j=>({j,f:fitRaw(j,q)}));
+  const best=Math.max(0.001,...scored.map(s=>s.f.raw));
+  LAST=scored.map(s=>{const fitN=s.f.raw/best;const co=cost(s.j,TIER);const turn=TURN[s.j.turn];
+    return {j:s.j,fitN,hits:s.f.hits,co,turn};}).filter(r=>r.fitN>=FIT_FLOOR);
+  document.getElementById('filters').style.display='flex';
+  render();
+  document.getElementById('filters').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function render(){
+  const out=document.getElementById('output');
+  if(!LAST.length){out.innerHTML='<div class="empty">No journal in this curated set reached 60% topical fit. Try adding keywords or an abstract, or broadening the title. The full database will hold many more journals.</div>';return;}
+  let rows=[...LAST];
+  if(document.getElementById('f-free').checked)rows=rows.filter(r=>r.co.c===0);
+  if(document.getElementById('f-fast').checked)rows=rows.filter(r=>r.j.turn==='fast');
+  if(document.getElementById('f-oa').checked)rows=rows.filter(r=>!r.j.oa.startsWith('Hybrid'));
+  const ec=r=>r.co.c+(r.co.pen||0)+(r.co.cert?0:15);
+  const sort=document.getElementById('sort').value;
+  rows.sort((a,b)=> sort==='fit'? (b.fitN-a.fitN)||(ec(a)-ec(b))
+    : sort==='if'? (b.j.iff-a.j.iff)||(ec(a)-ec(b))
+    : sort==='speed'? (a.turn.v-b.turn.v)||(ec(a)-ec(b))
+    : (ec(a)-ec(b))||(b.fitN-a.fitN)||(b.j.iff-a.j.iff));
+  let html=`<div class="rhead"><h2>Recommended journals</h2><span class="count">${rows.length} match${rows.length!=1?'es':''} at ≥60% fit · for an author in <b>${CNAME}</b> (Tier ${TIER})</span></div>`;
+  rows.forEach((r,i)=>{
+    const j=r.j,idx=/Scopus/.test(j.idx);const vurl=VMAP[j.rule]||'';
+    html+=`<div class="card ${r.co.c===0?'free':''}">
+      <div class="ctop">
+        <div class="rank">${i+1}</div>
+        <div style="min-width:0">
+          <div class="jname"><a href="${j.jurl}" target="_blank" rel="noopener">${j.name}</a></div>
+          <div class="pub">${j.pub} · ${j.issn||''} · ${j.rev} review</div>
+        </div>
+        <div class="iff"><b>${j.iff.toFixed(1)}</b><span>impact</span></div>
+      </div>
+      <div class="cost">
+        <span class="pill ${r.co.cls}">💰 ${r.co.label}</span>
+        ${vurl?`<span class="verify"><a href="${vurl}" target="_blank" rel="noopener">verify %</a></span>`:'<span class="verify">society-funded · no APC</span>'}
+      </div>
+      ${r.co.alt?`<div class="altcost">↳ ${r.co.alt}</div>`:''}
+      <div class="chips">
+        ${oaChip(j.oa)}
+        <span class="chip ${r.turn.cls}">⏱ ${r.turn.l}</span>
+        <span class="chip ${idx?'g':'a'}">📚 ${j.idx}</span>
+        ${j.pred==='Yes'?'<span class="chip r">⚠ predatory-risk</span>':'<span class="chip g">✓ not flagged predatory</span>'}
+      </div>
+      <div class="why"><b>Fit ${Math.round(r.fitN*100)}%</b><span class="fitbar"><i style="width:${Math.round(r.fitN*100)}%"></i></span>${r.hits.length?`matched on <b>${r.hits.join(', ')}</b>. `:''}${j.notes}</div>
+    </div>`;
+  });
+  out.innerHTML=html;
+}
+function loadExample(){
+  document.getElementById('title').value="Genome-Wide Association Study of Grain Yield and Drought Tolerance Traits in Cowpea (Vigna unguiculata (L.) Walp.)";
+  document.getElementById('keywords').value="cowpea, Vigna unguiculata, GWAS, drought tolerance, grain yield, SNP markers, genomic selection, legume, abiotic stress, marker-trait association";
+  document.getElementById('abstract').value="Cowpea is a key grain legume for food security in semi-arid Africa. Using a diverse panel genotyped with genome-wide SNP markers, this study identified loci associated with grain yield and drought-tolerance traits, informing marker-assisted and genomic selection for improved cultivars.";
+  document.getElementById('country').value=COUNTRY_LIST.findIndex(c=>c.n==="Kenya");
+  runMatch();
+}
+(function(){
+  const sel=document.getElementById('country');
+  COUNTRY_LIST.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.n+(c.t!=="none"?`  (Tier ${c.t})`:"");sel.appendChild(o);});
+  sel.value=COUNTRY_LIST.findIndex(c=>c.n==="Kenya");
+  document.getElementById('title').addEventListener('keydown',e=>{if(e.key==='Enter')runMatch();});
+})();
+</script>
+</body>
+</html>
